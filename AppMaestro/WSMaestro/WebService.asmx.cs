@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
+using System.Web.Script.Serialization;
 using System.Web.Script.Services;
 using System.Web.Services;
 
@@ -20,9 +21,19 @@ namespace WSMaestro
 
         [WebMethod]
         [ScriptMethod(UseHttpGet = true, ResponseFormat = ResponseFormat.Json)]
-        public string HelloWorld()
+        public void HelloWorld()
         {
-            return "Hola a todos";
+            JavaScriptSerializer js = new JavaScriptSerializer();
+            Context.Response.Clear();
+            Context.Response.ContentType = "application/json";
+            Employee emp = new Employee();
+            emp.EmployeeName = "testName";
+            Context.Response.Write(js.Serialize(emp));
+        }
+
+        public class Employee
+        {
+            public String EmployeeName = "";
         }
     }
 }
