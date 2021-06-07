@@ -5,6 +5,7 @@ using System.Web;
 using System.Web.Script.Serialization;
 using System.Web.Script.Services;
 using System.Web.Services;
+using WSMaestro.Controller;
 
 namespace WSMaestro
 {
@@ -21,19 +22,14 @@ namespace WSMaestro
 
         [WebMethod]
         [ScriptMethod(UseHttpGet = true, ResponseFormat = ResponseFormat.Json)]
-        public void HelloWorld()
+        public void GetAllPedidos()
         {
-            JavaScriptSerializer js = new JavaScriptSerializer();
+            MaestroController controller = new MaestroController();
+            string listPedidos = controller.GetAllPedidosDb();
             Context.Response.Clear();
             Context.Response.ContentType = "application/json";
-            Employee emp = new Employee();
-            emp.EmployeeName = "testName";
-            Context.Response.Write(js.Serialize(emp));
+            Context.Response.Write(listPedidos);
         }
-
-        public class Employee
-        {
-            public String EmployeeName = "";
-        }
+       
     }
 }
