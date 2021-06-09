@@ -19,17 +19,82 @@ namespace WSMaestro
     [System.Web.Script.Services.ScriptService]
     public class WebService : System.Web.Services.WebService
     {
+    MaestroController controller = new MaestroController();
+    DetalleController controllerDetalle = new DetalleController();
 
         [WebMethod]
-        [ScriptMethod(UseHttpGet = true, ResponseFormat = ResponseFormat.Json)]
+        [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
         public void GetAllPedidos()
-        {
-            MaestroController controller = new MaestroController();
+        {           
             string listPedidos = controller.GetAllPedidosDb();
             Context.Response.Clear();
             Context.Response.ContentType = "application/json";
             Context.Response.Write(listPedidos);
         }
-       
+
+        [WebMethod]
+        [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
+        public void GetPedidosDetalleId(int Id)
+        {
+            string listPedidosDetalle = controllerDetalle.GetPedidosDetalleIdDB(Id);
+            Context.Response.Clear();
+            Context.Response.ContentType = "application/json";
+            Context.Response.Write(listPedidosDetalle);
+        }
+
+        [WebMethod]
+        [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
+        public void GetPedidosId(int Id)
+        {
+            string Pedido = controller.GetPedidosIdDB(Id);
+            Context.Response.Clear();
+            Context.Response.ContentType = "application/json";
+            Context.Response.Write(Pedido);
+        }
+
+        [WebMethod]
+        [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
+        public void ModifyPedido(int Id, string Telefono, string Direccion, string User)
+        {
+            string Pedido = "";
+            if (Id != 0)
+            {
+                if (string.IsNullOrEmpty(Telefono))
+                {
+                    Telefono = "";
+                }
+                if (string.IsNullOrEmpty(Direccion))
+                {
+                    Direccion = "";
+                }
+                if (string.IsNullOrEmpty(User))
+                {
+                    User = "";
+                }
+                Pedido = controller.ModifyPedidoDB(Id, Telefono, Direccion, User);
+            }           
+            Context.Response.Clear();
+            Context.Response.ContentType = "application/json";
+            Context.Response.Write(Pedido);
+        }
+
+        [WebMethod]
+        [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
+        public void DeletePedidoDetalle(int Id, int IdPedido, string User)
+        {
+            string Pedido = "";
+            if (Id != 0)
+            {
+                
+                if (string.IsNullOrEmpty(User))
+                {
+                    User = "";
+                }
+                Pedido = controllerDetalle.DeletePedidoDetalleDB(Id, IdPedido, User);
+            }
+            Context.Response.Clear();
+            Context.Response.ContentType = "application/json";
+            Context.Response.Write(Pedido);
+        }
     }
 }
