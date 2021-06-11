@@ -6,6 +6,7 @@ using System.Web.Script.Serialization;
 using System.Web.Script.Services;
 using System.Web.Services;
 using WSMaestro.Controller;
+using WSMaestro.Model;
 
 namespace WSMaestro
 {
@@ -23,33 +24,42 @@ namespace WSMaestro
     DetalleController controllerDetalle = new DetalleController();
 
         [WebMethod]
-        [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
+        [ScriptMethod(UseHttpGet = true, ResponseFormat = ResponseFormat.Json)]
         public void GetAllPedidos()
         {           
-            string listPedidos = controller.GetAllPedidosDb();
+           string listPedidos = controller.GetAllPedidosDb();
             Context.Response.Clear();
             Context.Response.ContentType = "application/json";
+            Context.Response.AddHeader("content-length", listPedidos.Length.ToString());
+            Context.Response.Flush();
             Context.Response.Write(listPedidos);
+            HttpContext.Current.ApplicationInstance.CompleteRequest();
         }
 
         [WebMethod]
-        [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
+        [ScriptMethod(UseHttpGet = true, ResponseFormat = ResponseFormat.Json)]
         public void GetPedidosDetalleId(int Id)
         {
             string listPedidosDetalle = controllerDetalle.GetPedidosDetalleIdDB(Id);
             Context.Response.Clear();
             Context.Response.ContentType = "application/json";
+            Context.Response.AddHeader("content-length", listPedidosDetalle.Length.ToString());
+            Context.Response.Flush();
             Context.Response.Write(listPedidosDetalle);
+            HttpContext.Current.ApplicationInstance.CompleteRequest();
         }
 
         [WebMethod]
-        [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
+        [ScriptMethod(UseHttpGet = true, ResponseFormat = ResponseFormat.Json)]
         public void GetPedidosId(int Id)
         {
             string Pedido = controller.GetPedidosIdDB(Id);
             Context.Response.Clear();
             Context.Response.ContentType = "application/json";
+            Context.Response.AddHeader("content-length", Pedido.Length.ToString());
+            Context.Response.Flush();
             Context.Response.Write(Pedido);
+            HttpContext.Current.ApplicationInstance.CompleteRequest();
         }
 
         [WebMethod]
@@ -72,10 +82,13 @@ namespace WSMaestro
                     User = "";
                 }
                 Pedido = controller.ModifyPedidoDB(Id, Telefono, Direccion, User);
-            }           
+            }
             Context.Response.Clear();
             Context.Response.ContentType = "application/json";
+            Context.Response.AddHeader("content-length", Pedido.Length.ToString());
+            Context.Response.Flush();
             Context.Response.Write(Pedido);
+            HttpContext.Current.ApplicationInstance.CompleteRequest();
         }
 
         [WebMethod]
@@ -94,7 +107,10 @@ namespace WSMaestro
             }
             Context.Response.Clear();
             Context.Response.ContentType = "application/json";
+            Context.Response.AddHeader("content-length", Pedido.Length.ToString());
+            Context.Response.Flush();
             Context.Response.Write(Pedido);
+            HttpContext.Current.ApplicationInstance.CompleteRequest();
         }
     }
 }

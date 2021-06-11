@@ -7,6 +7,7 @@ using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Web.Http;
+using WSMaestro.Model;
 
 namespace WSMaestro.Controller
 {
@@ -15,49 +16,65 @@ namespace WSMaestro.Controller
         private Connect connect = new Connect();
         public string GetPedidosDetalleIdDB(int Id)
         {
-            DataSet pedidos = new DataSet();
+            List<PedidoDetalle> pedidos = new List<PedidoDetalle>();
             string sql = "SELECT  [IdDetalle] ,[Producto],[Cantidad],[Precio],[Subtotal] "
                         + " FROM[dbConnect].[dbo].[PedidoDetalle] "
                         + " WHERE [Active]  = 1 "
                         + " AND [IdPedido]  = @ID"
                         ;
 
-            using (SqlConnection conn = new SqlConnection(connect.Conexion()))
+            using (SqlConnection con = new SqlConnection(connect.Conexion()))
             {
                 try
                 {
-                    SqlCommand command = new SqlCommand(sql, conn);
-                    command.CommandText = sql;
-                    command.Parameters.Add("@ID", SqlDbType.Int);
-                    command.Parameters["@ID"].Value = Id;
-
-                    conn.Open();
-
-                    using (SqlDataAdapter adapter = new SqlDataAdapter(sql, conn))
+                    using (SqlCommand cmd = new SqlCommand(sql, con))
                     {
-                        adapter.SelectCommand = command;
-                        adapter.Fill(pedidos);
-                        if (pedidos.Tables.Count > 0)
-                        {
-                            string jspedidos = JsonConvert.SerializeObject(pedidos.Tables[0]);
-                            return jspedidos;
-                        }
-                        else
-                        {
-                            return "No data";
-                        }
 
+                        cmd.CommandType = CommandType.Text;
+                        cmd.Parameters.Add("@ID", SqlDbType.Int).Value = Id;
+
+                        con.Open();
+                        using (SqlDataReader sdr = cmd.ExecuteReader())
+                        {
+                            while (sdr.Read())
+                            {
+                                pedidos.Add(new PedidoDetalle
+                                {
+                                    IdDetalle = sdr["IdDetalle"].ToString(),
+                                    Producto = sdr["Producto"].ToString(),
+                                    Cantidad = sdr["Cantidad"].ToString(),
+                                    Precio = sdr["Precio"].ToString(),
+                                    SubTotal = sdr["SubTotal"].ToString(),
+                                    Mensaje = "Ok"
+                                });
+                            }
+                        }
+                        con.Close();
+                        string jspedidos = JsonConvert.SerializeObject(pedidos);
+                        return jspedidos;
                     }
                 }
                 catch (Exception ex)
                 {
-                    conn.Close();
-                    return "";
+                    con.Close();
+                    pedidos.Add(new PedidoDetalle
+                    {
+                        IdDetalle = "",
+                        Producto = "",
+                        Cantidad = "",
+                        Precio = "",
+                        SubTotal = "",
+                        Mensaje = ex.Message
+                    });
+
+                    string jspedidos = JsonConvert.SerializeObject(pedidos);
+                    return jspedidos;
                 }
                 finally
                 {
-                    conn.Close();
+                    con.Close();
                 }
+
             }
 
         }
