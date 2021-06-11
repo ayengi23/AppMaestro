@@ -11,16 +11,25 @@ namespace AppMaestro
 {
 
 
-    public partial class SiteMaster
+    public partial class ConsultarDetalle
     {
 
         /// <summary>
-        /// Control MainContent.
+        /// Control lblId.
         /// </summary>
         /// <remarks>
         /// Campo generado automáticamente.
         /// Para modificarlo, mueva la declaración del campo del archivo del diseñador al archivo de código subyacente.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.ContentPlaceHolder MainContent;
+        protected global::System.Web.UI.WebControls.Label lblId;
+
+        /// <summary>
+        /// Control gvpedidos.
+        /// </summary>
+        /// <remarks>
+        /// Campo generado automáticamente.
+        /// Para modificarlo, mueva la declaración del campo del archivo del diseñador al archivo de código subyacente.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.GridView gvpedidos;
     }
 }

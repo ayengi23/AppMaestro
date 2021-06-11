@@ -1,8 +1,12 @@
-﻿using Newtonsoft.Json;
+﻿using Microsoft.Ajax.Utilities;
+using Newtonsoft.Json;
 using System;
+using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
+using System.Linq;
 using System.Web.Script.Serialization;
+using WSMaestro.Model;
 
 namespace WSMaestro.Controller
 {
@@ -12,98 +16,130 @@ namespace WSMaestro.Controller
 
         public string GetAllPedidosDb()
         {
-            JavaScriptSerializer js = new JavaScriptSerializer();
-            DataSet pedidos = new DataSet();
-            SqlConnection cnn;
-            cnn = new SqlConnection(connect.Conexion());
-            string sql = "SELECT  [IdPedido] ,[NumPedido],[FechaPedido],[Cliente] "
-                        + " FROM[dbConnect].[dbo].[PedidoHeader] "
-                        + " WHERE [Activo]  = 1 ";
+            List<PedidoHeader> pedidos = new List<PedidoHeader>();
+            string sql = "SELECT  IdPedido ,NumPedido,FechaPedido,Cliente,Telefono,Direccion "
+                       + " FROM [dbConnect].[dbo].[PedidoHeader] "
+                       + " WHERE Activo  = 1 ";
 
-            using (SqlConnection conn = new SqlConnection(connect.Conexion()))
+            using (SqlConnection con = new SqlConnection(connect.Conexion()))
             {
                 try
                 {
-                    conn.Open();
-
-                    using (SqlDataAdapter adapter = new SqlDataAdapter(sql, conn)) 
+                    using (SqlCommand cmd = new SqlCommand(sql, con))
                     {
-                        adapter.Fill(pedidos);
-                        if (pedidos.Tables.Count > 0)
+                        
+                        cmd.CommandType = CommandType.Text;
+                        con.Open();
+                        using (SqlDataReader sdr = cmd.ExecuteReader())
                         {
-                            string jspedidos = JsonConvert.SerializeObject(pedidos.Tables[0]);
-                            return jspedidos;
+                            while (sdr.Read())
+                            {
+                                pedidos.Add(new PedidoHeader
+                                {
+                                    IdPedido = sdr["IdPedido"].ToString(),
+                                    NumPedido = sdr["NumPedido"].ToString(),
+                                    FechaPedido = sdr["FechaPedido"].ToString(),
+                                    Cliente = sdr["Cliente"].ToString(),
+                                    Telefono = sdr["Telefono"].ToString(),
+                                    Direccion = sdr["Direccion"].ToString(),
+                                    Mensaje = "Ok"
+                                });
+                            }
                         }
-                        else
-                        {
-                            string jspedidos = JsonConvert.SerializeObject("No data");
-                            return jspedidos;
-                        }
-                       
+                        con.Close();
+                        string jspedidos = JsonConvert.SerializeObject(pedidos);
+                        return jspedidos;
+                        //return pedidos;
                     }
                 }
                 catch (Exception ex)
                 {
-                    conn.Close();
-                    string jspedidos = JsonConvert.SerializeObject(ex.Message);
+                    con.Close();
+                    pedidos.Add(new PedidoHeader
+                    {
+                        IdPedido = "",
+                        NumPedido = "",
+                        FechaPedido = "",
+                        Cliente = "",
+                        Telefono = "",
+                        Direccion = "",
+                        Mensaje = ex.Message
+                    });
+
+                    string jspedidos = JsonConvert.SerializeObject(pedidos);
                     return jspedidos;
                 }
                 finally
                 {
-                    conn.Close();
+                    con.Close();
                 }
+               
             }
-           
         }
 
         public string GetPedidosIdDB(int Id)
         {
-            DataSet pedidos = new DataSet();
-            string sql = "SELECT  [IdPedido] ,[NumPedido],[FechaPedido],[Cliente] "
+            List<PedidoHeader> pedidos = new List<PedidoHeader>();
+            string sql = "SELECT  IdPedido ,NumPedido,FechaPedido,Cliente,Telefono,Direccion "
                        + " FROM[dbConnect].[dbo].[PedidoHeader] "
                        + " WHERE [Activo]  = 1 "
                        +" AND [IdPedido]  = @ID"
                         ;
 
-            using (SqlConnection conn = new SqlConnection(connect.Conexion()))
+            using (SqlConnection con = new SqlConnection(connect.Conexion()))
             {
                 try
                 {
-                    SqlCommand command = new SqlCommand(sql, conn);
-                    command.CommandText = sql;
-                    command.Parameters.Add("@ID", SqlDbType.Int).Value = Id;
-
-                    conn.Open();
-
-                    using (SqlDataAdapter adapter = new SqlDataAdapter(sql, conn))
+                    using (SqlCommand cmd = new SqlCommand(sql, con))
                     {
-                        adapter.SelectCommand = command;
-                        adapter.Fill(pedidos);
-                        if (pedidos.Tables.Count > 0)
-                        {
-                            string jspedidos = JsonConvert.SerializeObject(pedidos.Tables[0]);
-                            return jspedidos;
-                        }
-                        else
-                        {
-                            string jspedidos = JsonConvert.SerializeObject("No data");
-                            return jspedidos;
-                        }
 
+                        cmd.CommandType = CommandType.Text;
+                        cmd.Parameters.Add("@ID", SqlDbType.Int).Value = Id;
+
+                        con.Open();
+                        using (SqlDataReader sdr = cmd.ExecuteReader())
+                        {
+                            while (sdr.Read())
+                            {
+                                pedidos.Add(new PedidoHeader
+                                {
+                                    IdPedido = sdr["IdPedido"].ToString(),
+                                    NumPedido = sdr["NumPedido"].ToString(),
+                                    FechaPedido = sdr["FechaPedido"].ToString(),
+                                    Cliente = sdr["Cliente"].ToString(),
+                                    Telefono = sdr["Telefono"].ToString(),
+                                    Direccion = sdr["Direccion"].ToString(),
+                                    Mensaje = "Ok"
+                                });
+                            }
+                        }
+                        con.Close();
+                        string jspedidos = JsonConvert.SerializeObject(pedidos);
+                        return jspedidos;
                     }
                 }
                 catch (Exception ex)
                 {
-                    conn.Close();
-                    string jspedidos = JsonConvert.SerializeObject(ex.Message);
+                    con.Close();
+                    pedidos.Add(new PedidoHeader
+                    {
+                        IdPedido = "",
+                        NumPedido = "",
+                        FechaPedido = "",
+                        Cliente = "",
+                        Telefono = "",
+                        Direccion = "",
+                        Mensaje = ex.Message
+                    });
+
+                    string jspedidos = JsonConvert.SerializeObject(pedidos);
                     return jspedidos;
                 }
                 finally
                 {
-                    conn.Close();
+                    con.Close();
                 }
             }
-
         }
 
 
